@@ -13,11 +13,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [ChangeNotifierProvider(create: (context)=>TodolistProvider())],
+      providers: [
+        ChangeNotifierProvider(create: (context) => TodolistProvider())
+      ],
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          colorScheme: ColorScheme.fromSeed(
+              seedColor: const Color.fromARGB(255, 150, 183, 58)),
           useMaterial3: true,
         ),
         home: const MyHomePage(title: 'Provider Practice'),
@@ -36,7 +39,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int currentPageIndex = 0;
-  String  counter='new';
+  String counter = 'new';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,7 +53,8 @@ class _MyHomePageState extends State<MyHomePage> {
             currentPageIndex = index;
           });
         },
-        indicatorColor: Colors.amber,
+        // indicatorColor: Colors.amber,
+        indicatorColor: Theme.of(context).colorScheme.primary,
         selectedIndex: currentPageIndex,
         destinations: const <Widget>[
           NavigationDestination(
@@ -84,16 +88,18 @@ class Widget2 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Card(
-      shadowColor: Colors.transparent,
-      margin: EdgeInsets.all(8.0),
-      child: SizedBox.expand(
-        child: Center(
-          child: Text(
-            'Home page 2',
-          ),
-        ),
-      ),
+    var data = context.watch<TodolistProvider>().todos;
+    return ListView(
+      children: [
+        for (var i in data)
+          Card(
+            shadowColor: Theme.of(context).colorScheme.primary,
+            margin: const EdgeInsets.all(8.0),
+            child: Center(
+              child: Text(i.toString()),
+            ),
+          )
+      ],
     );
   }
 }
@@ -105,16 +111,18 @@ class Widget1 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      shadowColor: Colors.transparent,
-      margin: const EdgeInsets.all(8.0),
-      child: SizedBox.expand(
-        child: Center(
-          child: Text(
-            context.watch<TodolistProvider>().value
-          ),
-        ),
-      ),
+    var data = context.watch<TodolistProvider>().todos;
+    return ListView(
+      children: [
+        for (var i in data)
+          Card(
+            shadowColor: Theme.of(context).colorScheme.secondary,
+            margin: const EdgeInsets.all(8.0),
+            child: Center(
+              child: Text(i.toString()),
+            ),
+          )
+      ],
     );
   }
 }
