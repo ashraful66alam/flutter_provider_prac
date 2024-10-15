@@ -114,6 +114,12 @@ class Widget1 extends StatelessWidget {
     var data = context.watch<TodolistProvider>().todos;
     return ListView(
       children: [
+        TextFormField(
+          decoration: const InputDecoration(
+            border: UnderlineInputBorder(),
+            labelText: 'New Task',
+          ),
+        ),
         for (var i in data)
           Card(
             shadowColor: Theme.of(context).colorScheme.secondary,
