@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:provider_prac/providers/todolist_provider.dart';
+import 'package:provider_prac/providers/text_provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,9 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => TodolistProvider())
-      ],
+      providers: [ChangeNotifierProvider(create: (context) => TextProvider())],
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(
@@ -23,112 +21,114 @@ class MyApp extends StatelessWidget {
               seedColor: const Color.fromARGB(255, 150, 183, 58)),
           useMaterial3: true,
         ),
-        home: const MyHomePage(title: 'Provider Practice'),
+        home: const FirstRoute(),
       ),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-  final String title;
+class FirstRoute extends StatelessWidget {
+  const FirstRoute({super.key});
 
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int currentPageIndex = 0;
-  String counter = 'new';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        title: const Text('First Route'),
       ),
-      bottomNavigationBar: NavigationBar(
-        onDestinationSelected: (int index) {
-          setState(() {
-            currentPageIndex = index;
-          });
-        },
-        // indicatorColor: Colors.amber,
-        indicatorColor: Theme.of(context).colorScheme.primary,
-        selectedIndex: currentPageIndex,
-        destinations: const <Widget>[
-          NavigationDestination(
-            selectedIcon: Icon(Icons.home),
-            icon: Icon(Icons.home_outlined),
-            label: 'Page 1',
-          ),
-          NavigationDestination(
-            selectedIcon: Icon(Icons.notifications_sharp),
-            icon: Icon(Icons.notifications_outlined),
-            label: 'Page 2',
-          ),
-        ],
-      ),
-      body: <Widget>[
-        /// Home page
-        const Widget1(),
-        const Widget2(),
-
-        /// Notifications page
-      ][currentPageIndex],
-      // This trailing comma makes auto-formatting nicer for build methods.
-    );
-  }
-}
-
-class Widget2 extends StatelessWidget {
-  const Widget2({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    var data = context.watch<TodolistProvider>().todos;
-    return ListView(
-      children: [
-        for (var i in data)
-          Card(
-            shadowColor: Theme.of(context).colorScheme.primary,
-            margin: const EdgeInsets.all(8.0),
-            child: Center(
-              child: Text(i.toString()),
+      body: Center(
+        child: Column(
+          children: [
+            Text(context.watch<TextProvider>().value),
+            ElevatedButton(
+              child: const Text('Open route'),
+              onPressed: () {
+                // Navigate to second route when tapped.
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SecondRoute()),
+                );
+              },
             ),
-          )
-      ],
-    );
-  }
-}
-
-class Widget1 extends StatelessWidget {
-  const Widget1({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    var data = context.watch<TodolistProvider>().todos;
-    return ListView(
-      children: [
-        TextFormField(
-          decoration: const InputDecoration(
-            border: UnderlineInputBorder(),
-            labelText: 'New Task',
-          ),
+          ],
         ),
-        for (var i in data)
-          Card(
-            shadowColor: Theme.of(context).colorScheme.secondary,
-            margin: const EdgeInsets.all(8.0),
-            child: Center(
-              child: Text(i.toString()),
+      ),
+    );
+  }
+}
+
+class SecondRoute extends StatefulWidget {
+  const SecondRoute({super.key});
+
+  @override
+  State<SecondRoute> createState() => _SecondRouteState();
+}
+
+class _SecondRouteState extends State<SecondRoute> {
+  final myController = TextEditingController();
+
+//  @override
+//   void initState() {
+//     super.initState();
+
+//     // Start listening to changes.
+//     myController.addListener(context.watch<TextProvider>().add(myController.text));
+//   }
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    myController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Second Route'),
+      ),
+      body: Center(
+        child: Column(
+          children: [
+            TextField(
+              onChanged: (text) {
+                context.read<TextProvider>().add(myController.text);
+              },
+              decoration: const InputDecoration(
+                border: UnderlineInputBorder(),
+                labelText: 'Add Task',
+              ),
+              controller: myController,
             ),
-          )
-      ],
+            ElevatedButton(
+              onPressed: () {
+                // Navigate back to first route when tapped.
+                Navigator.pop(context);
+              },
+              child: const Text('Go back!'),
+            ),
+            FloatingActionButton(
+              // When the user presses the button, show an alert dialog containing
+              // the text that the user has entered into the text field.
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      // Retrieve the text the that user has entered by using the
+                      // TextEditingController.
+                      content: Text(myController.text),
+                    );
+                  },
+                );
+              },
+              tooltip: 'Show me the value!',
+              child: const Icon(Icons.text_fields),
+            )
+          ],
+        ),
+      ),
     );
   }
 }
