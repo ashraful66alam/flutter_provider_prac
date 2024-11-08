@@ -41,10 +41,40 @@ class FirstRoute extends StatelessWidget {
           children: [
             Text(context.watch<TextProvider>().value),
             ElevatedButton(
-              child: const Text('Open route'),
+              child: const Text('Open interim route'),
               onPressed: () {
                 // Navigate to second route when tapped.
                 Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const InterimRoute()),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class InterimRoute extends StatelessWidget {
+  const InterimRoute({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Interim Route'),
+      ),
+      body: Center(
+        child: Column(
+          children: [
+            // Text(context.watch<TextProvider>().value),
+            ElevatedButton(
+              child: const Text('Open 3rd route'),
+              onPressed: () {
+                // Navigate to second route when tapped.
+                Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => const SecondRoute()),
                 );
